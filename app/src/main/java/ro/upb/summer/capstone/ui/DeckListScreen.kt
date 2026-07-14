@@ -1,5 +1,6 @@
 package ro.upb.summer.capstone.ui
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -24,7 +25,7 @@ import ro.upb.summer.capstone.ui.theme.CapstoneStarterTheme
  * Hardcoded deck list. Session 1 refactors this into a ViewModel with UiState.
  * Session 3 replaces the hardcoded list with a Firestore-backed Flow.
  */
-private data class MockDeck(val id: String, val title: String, val cardCount: Int)
+data class MockDeck(val id: String, val title: String, val cardCount: Int)
 
 private val mockDecks = listOf(
     MockDeck("1", "Kotlin basics", 12),
@@ -34,7 +35,7 @@ private val mockDecks = listOf(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun DeckListScreen() {
+fun DeckListScreen(onDeckClicked: (MockDeck) -> Unit) {
     Scaffold(
         topBar = {
             TopAppBar(title = { Text("Your decks") })
@@ -49,16 +50,21 @@ fun DeckListScreen() {
             contentPadding = androidx.compose.foundation.layout.PaddingValues(vertical = 16.dp),
         ) {
             items(mockDecks, key = { it.id }) { deck ->
-                DeckCard(deck = deck)
+                DeckCard(deck = deck) {
+                    onDeckClicked(deck)
+                }
             }
         }
     }
 }
 
 @Composable
-private fun DeckCard(deck: MockDeck) {
+private fun DeckCard(deck: MockDeck, onCardClicked: () -> Unit) {
     Card(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier.fillMaxWidth().clickable(
+            enabled = true,
+            onClick = onCardClicked,
+        ),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
@@ -79,6 +85,6 @@ private fun DeckCard(deck: MockDeck) {
 @Composable
 private fun DeckListScreenPreview() {
     CapstoneStarterTheme {
-        DeckListScreen()
+        DeckListScreen { }
     }
 }
