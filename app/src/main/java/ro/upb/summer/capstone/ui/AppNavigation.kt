@@ -10,6 +10,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
 import kotlinx.serialization.Serializable
+import ro.upb.summer.capstone.ui.auth.SignInScreen
 
 @Composable
 fun AppNavigation() {
@@ -20,14 +21,14 @@ fun AppNavigation() {
         startDestination = Route.AuthRoute
     ) {
         composable<Route.AuthRoute> {
-            SignInScreen {
+            SignInScreen(onSignedIn = {
                 // i need to navigate to the deckList path
                 navController.navigate(Route.DeckList) {
                     popUpTo(Route.AuthRoute) {
                         inclusive = true
                     }
                 }
-            }
+            })
         }
         composable<Route.DeckList> {
             DeckListScreen {
