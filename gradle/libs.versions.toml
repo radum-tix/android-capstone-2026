@@ -3,6 +3,7 @@
 agp = "9.2.1"
 kotlin = "2.2.20"
 ksp = "2.2.20-2.0.0"
+serialization = "1.11.0"
 
 # Compose
 composeBom = "2026.06.01"
@@ -45,6 +46,9 @@ androidx-compose-material-icons-extended = { group = "androidx.compose.material"
 
 # Coroutines
 kotlinx-coroutines-android = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-android", version.ref = "coroutines" }
+
+# Other
+kotlinx-serialization = { group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-json", version.ref = "serialization" }
 
 # Testing
 junit = { group = "junit", name = "junit", version.ref = "junit" }
