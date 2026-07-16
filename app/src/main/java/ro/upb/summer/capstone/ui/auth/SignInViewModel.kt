@@ -1,17 +1,22 @@
 package ro.upb.summer.capstone.ui.auth
 
+import android.app.Activity
+import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.viewmodel.compose.viewModel
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import ro.upb.summer.capstone.data.auth.AuthRepository
-import ro.upb.summer.capstone.data.auth.AuthRepositoryImpl
+import javax.inject.Inject
 
-class SignInViewModel(
-    private val authRepository: AuthRepository = AuthRepositoryImpl()
+@HiltViewModel
+class SignInViewModel @Inject constructor(
+    private val authRepository: AuthRepository
 ) : ViewModel() {
     private val _state = MutableStateFlow<SignInState>(SignInState.Idle)
     val state: StateFlow<SignInState>
@@ -43,7 +48,13 @@ class SignInViewModel(
         }
     }
 
-    fun onSignInWithGoogle() {
-
+    fun onSignInWithGoogle(context: Context) {
+        viewModelScope.launch {
+            try {
+                authRepository.signInWithGoogle(context)
+            } catch (exception: Exception) {
+                //TODO: show an error
+            }
+        }
     }
 }
