@@ -14,6 +14,7 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
 import kotlinx.serialization.Serializable
 import ro.upb.summer.capstone.ui.auth.SignInScreen
+import ro.upb.summer.capstone.ui.decks.DeckListScreen
 
 @Composable
 fun AppNavigation(
@@ -37,9 +38,9 @@ fun AppNavigation(
             })
         }
         composable<Route.DeckList> {
-            DeckListScreen {
-                navController.navigate(Route.DeckDetails(it.id))
-            }
+            DeckListScreen(onDeckClick = {
+                navController.navigate(Route.DeckDetails(it))
+            })
         }
         composable<Route.DeckDetails> { entry ->
             val route: Route.DeckDetails = entry.toRoute()

@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.outlined.Style
@@ -32,6 +33,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import ro.upb.summer.capstone.domain.Deck
 import ro.upb.summer.capstone.ui.common.EmptyState
 import ro.upb.summer.capstone.ui.common.ErrorState
@@ -90,22 +93,32 @@ fun DeckCard(
  * NOTE for Block D: the AnimatedContent + contentKey pattern goes here later.
  * For now this uses a plain when. Session 3 Block D teaches the refactor.
  */
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DeckListScreen(
     onDeckClick: (String) -> Unit,
-    onRetry: () -> Unit,
+    viewModel: DeckListViewModel = hiltViewModel(),
     modifier: Modifier = Modifier,
 ) {
-    //val state: TODO()
-    var showCreateSheet by remember { mutableStateOf(false) }
+    val state by viewModel.state.collectAsStateWithLifecycle()
+    InnerDeckListScreen(
+        onDeckClick,
+        state
+    )
+}
 
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun InnerDeckListScreen(
+    onDeckClick: (String) -> Unit,
+    state: DeckListUiState,
+    modifier: Modifier = Modifier,
+) {
     Scaffold(
         modifier = modifier,
         topBar = { TopAppBar(title = { Text("Your decks") }) },
         floatingActionButton = {
             ExtendedFloatingActionButton(
-                onClick = { showCreateSheet = true },
+                onClick = { /*  */ },
                 icon = { Icon(Icons.Filled.Add, contentDescription = null) },
                 text = { Text("New deck") },
             )
@@ -130,7 +143,7 @@ fun DeckListScreen(
                 }
                 is DeckListUiState.Error -> ErrorState(
                     message = state.message,
-                    onRetry = onRetry,
+                    onRetry = { },
                 )
             }
         }
