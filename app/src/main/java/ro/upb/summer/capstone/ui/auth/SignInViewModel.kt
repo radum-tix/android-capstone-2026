@@ -2,6 +2,7 @@ package ro.upb.summer.capstone.ui.auth
 
 import android.app.Activity
 import android.content.Context
+import android.util.Patterns
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -31,19 +32,24 @@ class SignInViewModel @Inject constructor(
 
     fun onSignIn(email: String, password: String) {
         if (email.isBlank()) {
-            //TODO: maybe show an error?
+            _state.value = SignInState.Error("Email cannot be blank")
+            return
+        }
+        if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+            _state.value = SignInState.Error("Invalid email")
             return
         }
         if (password.isBlank()) {
-            //TODO: maybe show a different error?
+            _state.value = SignInState.Error("Password cannot be blank")
             return
         }
 
         viewModelScope.launch {
+            _state.value = SignInState.Pending
             try {
                 authRepository.signIn(email, password)
             } catch (exception: Exception) {
-                //TODO: show an error
+                _state.value = SignInState.Error(exception.message ?: "We don't why it failed, but it did")
             }
         }
     }
@@ -53,7 +59,7 @@ class SignInViewModel @Inject constructor(
             try {
                 authRepository.signInWithGoogle(context)
             } catch (exception: Exception) {
-                //TODO: show an error
+                _state.value = SignInState.Error(exception.message ?: "We don't why it failed, but it did")
             }
         }
     }

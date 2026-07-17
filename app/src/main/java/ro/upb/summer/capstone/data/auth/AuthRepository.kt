@@ -30,6 +30,9 @@ class AuthRepository @Inject constructor() {
         }
     }
 
+    val isCurrentlySignedIn: Boolean
+        get() = Firebase.auth.currentUser != null
+
     suspend fun signIn(email: String, password: String) {
         Firebase.auth.signInWithEmailAndPassword(email, password)
             .await()

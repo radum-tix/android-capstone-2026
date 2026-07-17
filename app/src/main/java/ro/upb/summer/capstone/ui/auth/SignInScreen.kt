@@ -93,12 +93,12 @@ fun SignInScreen(
                 modifier = Modifier.padding(top = 8.dp),
             )
 
-            //TODO: when do we show an error?
-//                ErrorBanner(
-//                    message = error.message,
-//                    modifier = Modifier.padding(top = 24.dp),
-//                )
-//
+            (state as? SignInState.Error)?.let { error ->
+                ErrorBanner(
+                    message = error.message,
+                    modifier = Modifier.padding(top = 24.dp),
+                )
+            }
 
             OutlinedTextField(
                 value = email,

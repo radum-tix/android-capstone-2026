@@ -4,7 +4,10 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -13,12 +16,15 @@ import kotlinx.serialization.Serializable
 import ro.upb.summer.capstone.ui.auth.SignInScreen
 
 @Composable
-fun AppNavigation() {
+fun AppNavigation(
+    viewModel: MainViewModel = hiltViewModel()
+) {
     val navController = rememberNavController()
+    val isSignedIn by viewModel.isSignedIn.collectAsStateWithLifecycle()
 
     NavHost(
         navController = navController,
-        startDestination = Route.AuthRoute
+        startDestination = if (isSignedIn) Route.DeckList else Route.AuthRoute
     ) {
         composable<Route.AuthRoute> {
             SignInScreen(onSignedIn = {
