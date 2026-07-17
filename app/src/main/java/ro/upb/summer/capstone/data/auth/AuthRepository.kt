@@ -1,16 +1,13 @@
 package ro.upb.summer.capstone.data.auth
 
-import android.app.Activity
 import android.content.Context
 import androidx.credentials.CredentialManager
 import androidx.credentials.CustomCredential
 import androidx.credentials.GetCredentialRequest
 import com.google.android.libraries.identity.googleid.GetGoogleIdOption
 import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
-import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.GoogleAuthProvider
-import com.google.firebase.auth.auth
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
@@ -18,23 +15,25 @@ import kotlinx.coroutines.tasks.await
 import ro.upb.summer.capstone.BuildConfig
 import javax.inject.Inject
 
-class AuthRepository @Inject constructor() {
+class AuthRepository @Inject constructor(
+    private val firebaseAuth: FirebaseAuth
+) {
     val signedIn: Flow<Boolean> = callbackFlow {
         val listener = FirebaseAuth.AuthStateListener {
-            trySend(Firebase.auth.currentUser != null)
+            trySend(firebaseAuth.currentUser != null)
         }
 
-        Firebase.auth.addAuthStateListener(listener)
+        firebaseAuth.addAuthStateListener(listener)
         awaitClose {
-            Firebase.auth.removeAuthStateListener(listener)
+            firebaseAuth.removeAuthStateListener(listener)
         }
     }
 
     val isCurrentlySignedIn: Boolean
-        get() = Firebase.auth.currentUser != null
+        get() = firebaseAuth.currentUser != null
 
     suspend fun signIn(email: String, password: String) {
-        Firebase.auth.signInWithEmailAndPassword(email, password)
+        firebaseAuth.signInWithEmailAndPassword(email, password)
             .await()
     }
 
@@ -56,13 +55,13 @@ class AuthRepository @Inject constructor() {
         ) {
             val idToken = GoogleIdTokenCredential.createFrom(credential.data).idToken
             val firebaseCredential = GoogleAuthProvider.getCredential(idToken, null)
-            Firebase.auth.signInWithCredential(firebaseCredential).await()
+            firebaseAuth.signInWithCredential(firebaseCredential).await()
         } else {
             error("Unexpected credential type: ${credential.type}")
         }
     }
 
     suspend fun signOut() {
-        Firebase.auth.signOut()
+        firebaseAuth.signOut()
     }
 }
