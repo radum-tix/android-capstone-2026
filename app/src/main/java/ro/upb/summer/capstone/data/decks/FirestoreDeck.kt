@@ -5,11 +5,11 @@ import com.google.firebase.firestore.DocumentId
 import ro.upb.summer.capstone.domain.Deck
 
 data class FirestoreDeck(
-    @DocumentId val id: String,
-    val title: String,
-    val createdAt: Timestamp,
-    val updatedAt: Timestamp,
-    val noCards: Int
+    @DocumentId val id: String = "",
+    val title: String = "",
+    val createdAt: Timestamp = Timestamp.now(),
+    val updatedAt: Timestamp = Timestamp.now(),
+    val noCards: Int = 0
 )
 
 fun Deck.toFirebase() = FirestoreDeck(

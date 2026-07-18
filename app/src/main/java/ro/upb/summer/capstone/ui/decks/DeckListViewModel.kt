@@ -7,6 +7,8 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import ro.upb.summer.capstone.data.decks.DeckRepository
+import ro.upb.summer.capstone.domain.Deck
+import java.util.Date
 import javax.inject.Inject
 
 @HiltViewModel
@@ -34,6 +36,20 @@ class DeckListViewModel @Inject constructor(
             } catch (exception: Exception) {
                 _state.value = DeckListUiState.Error(exception.message ?: "I have no idea what's wrong")
             }
+        }
+    }
+
+    fun createNewDeck() {
+        viewModelScope.launch {
+            deckRepository.createDeck(
+                Deck(
+                    id = "",
+                    title = "No title available",
+                    createdAt = Date(),
+                    updatedAt = Date(),
+                    noCards = 0
+                )
+            )
         }
     }
 }

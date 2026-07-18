@@ -102,7 +102,8 @@ fun DeckListScreen(
     val state by viewModel.state.collectAsStateWithLifecycle()
     InnerDeckListScreen(
         onDeckClick,
-        state
+        onNewDeck = { viewModel.createNewDeck() },
+        state,
     )
 }
 
@@ -110,6 +111,7 @@ fun DeckListScreen(
 @Composable
 private fun InnerDeckListScreen(
     onDeckClick: (String) -> Unit,
+    onNewDeck: () -> Unit,
     state: DeckListUiState,
     modifier: Modifier = Modifier,
 ) {
@@ -118,7 +120,7 @@ private fun InnerDeckListScreen(
         topBar = { TopAppBar(title = { Text("Your decks") }) },
         floatingActionButton = {
             ExtendedFloatingActionButton(
-                onClick = { /*  */ },
+                onClick = { onNewDeck() },
                 icon = { Icon(Icons.Filled.Add, contentDescription = null) },
                 text = { Text("New deck") },
             )
