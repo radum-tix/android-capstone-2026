@@ -6,19 +6,27 @@ import android.graphics.BitmapFactory
 import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.google.firebase.Firebase
+import com.google.firebase.ai.FirebaseAI
+import com.google.firebase.ai.ai
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import ro.upb.summer.capstone.data.ai.AiRepository
+import ro.upb.summer.capstone.data.decks.DeckRepository
 import javax.inject.Inject
 
 @HiltViewModel
 class GenerateViewModel @Inject constructor(
     @param:ApplicationContext private val context: Context,
+    private val aiRepository: AiRepository,
+    private val deckRepository: DeckRepository
 ) : ViewModel() {
     private val _state = MutableStateFlow<GenerationState>(GenerationState.Idle)
     val state: StateFlow<GenerationState> = _state.asStateFlow()
@@ -33,7 +41,14 @@ class GenerateViewModel @Inject constructor(
         this.notes = notes
         viewModelScope.launch {
             val bitmap = imageUri?.let { loadBitmap(it) }
-            //TODO: generate cards
+            retry {
+                aiRepository.generate(notes, bitmap).collect {
+                    _state.value = it
+                    if (it is GenerationState.Error) {
+                        error("Failed")
+                    }
+                }
+            }
         }
     }
 
@@ -48,8 +63,34 @@ class GenerateViewModel @Inject constructor(
         if (title.isBlank() || _saving.value) return
         viewModelScope.launch {
             _saving.value = true
-            //TODO: save new deck
+            val deckId = deckRepository.saveDeck(title, notes, cards)
+            onSaved(deckId)
             _saving.value = false
         }
+    }
+
+    private suspend fun <T> retry(
+        maxRetry: Int = 3,
+        initialDelay: Long = 5000L,
+        block: suspend () -> T): T {
+
+        var attempts = 0
+        var delay = initialDelay
+
+        while (attempts < maxRetry) {
+            try {
+                println("Starting request")
+                return block()
+                println("Request successful")
+            } catch (exception: Exception) {
+                println("Request failed: $attempts")
+                // if needs retry
+                attempts++
+                delay(delay)
+                delay *= 2
+                println("Retrying request")
+            }
+        }
+        error("Did not finish")
     }
 }

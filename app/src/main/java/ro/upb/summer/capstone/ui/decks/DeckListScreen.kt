@@ -96,13 +96,14 @@ fun DeckCard(
 @Composable
 fun DeckListScreen(
     onDeckClick: (String) -> Unit,
+    onNewDeck: () -> Unit,
     viewModel: DeckListViewModel = hiltViewModel(),
     modifier: Modifier = Modifier,
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     InnerDeckListScreen(
         onDeckClick,
-        onNewDeck = { viewModel.createNewDeck() },
+        onNewDeck = onNewDeck,
         state,
     )
 }

@@ -1,6 +1,9 @@
 package ro.upb.summer.capstone.di
 
 import com.google.firebase.Firebase
+import com.google.firebase.ai.FirebaseAI
+import com.google.firebase.ai.ai
+import com.google.firebase.ai.type.GenerativeBackend
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.auth
 import com.google.firebase.firestore.FirebaseFirestore
@@ -21,4 +24,10 @@ object AppModule {
     @Provides
     @Singleton
     fun provideFirebaseFirestore(): FirebaseFirestore = Firebase.firestore
+
+    @Provides
+    @Singleton
+    fun provideFirebaseAi(): FirebaseAI = Firebase.ai(
+        backend = GenerativeBackend.googleAI()
+    )
 }

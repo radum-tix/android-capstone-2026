@@ -95,6 +95,8 @@ dependencies {
     implementation(libs.firebase.ai)
     implementation(libs.firebase.crashlytics)
     implementation(libs.firebase.config)
+    implementation(libs.firebase.appcheck.playintegrity)
+    debugImplementation(libs.firebase.appcheck.debug)
 
     // Testing (minimal for the starter, expanded later if needed)
     testImplementation(libs.junit)

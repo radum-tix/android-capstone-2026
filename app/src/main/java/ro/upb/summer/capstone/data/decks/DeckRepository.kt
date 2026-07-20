@@ -1,5 +1,6 @@
 package ro.upb.summer.capstone.data.decks
 
+import com.google.firebase.Timestamp
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
@@ -8,6 +9,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.tasks.await
 import ro.upb.summer.capstone.domain.Deck
+import ro.upb.summer.capstone.domain.GeneratedCard
 import javax.inject.Inject
 
 class DeckRepository @Inject constructor(
@@ -73,5 +75,39 @@ class DeckRepository @Inject constructor(
             .document()
 
         reference.set(firestoreDeck).await()
+    }
+
+    suspend fun saveDeck(deckName: String, deckNotes: String, cards: List<GeneratedCard>): String {
+        val uid = firebaseAuth.currentUser?.uid ?: error("User not authenticated")
+        val reference = firestore.collection("users")
+            .document(uid)
+            .collection("decks")
+            .document()
+
+        val batch = firestore.batch()
+        val now = Timestamp.now()
+
+        batch.set(
+            reference,
+            hashMapOf(
+                "title" to deckName,
+                "createdAt" to now,
+                "updatedAt" to now,
+                "noCards" to cards.size
+            )
+        )
+        for (card in cards) {
+            batch.set(
+                reference.collection("cards").document(),
+                hashMapOf(
+                    "question" to card.question,
+                    "answer" to card.answer,
+                    "createdAt" to now,
+                )
+            )
+        }
+
+        batch.commit().await()
+        return reference.id
     }
 }

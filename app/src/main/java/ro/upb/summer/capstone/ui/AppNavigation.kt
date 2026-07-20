@@ -35,9 +35,14 @@ fun AppNavigation(
             })
         }
         composable<Route.DeckList> {
-            DeckListScreen(onDeckClick = {
-                navController.navigate(Route.DeckDetails(it))
-            })
+            DeckListScreen(
+                onDeckClick = {
+                    navController.navigate(Route.DeckDetails(it))
+                },
+                onNewDeck = {
+                    navController.navigate(Route.Generate)
+                }
+            )
         }
         composable<Route.DeckDetails> {
             // Now the deck id is read directly in the view model
@@ -52,7 +57,7 @@ fun AppNavigation(
                 onBack = navController::popBackStack,
                 onSaved = { deckId ->
                     navController.navigate(Route.DeckDetails(deckId)) {
-                        popUpTo<Route.Generate> { inclusive = true }
+                        popUpTo<Route.DeckList>()
                     }
                 },
             )
