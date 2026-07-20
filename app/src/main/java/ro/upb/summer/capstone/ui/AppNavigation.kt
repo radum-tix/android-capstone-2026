@@ -1,20 +1,17 @@
 package ro.upb.summer.capstone.ui
 
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.ui.Alignment
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import androidx.navigation.toRoute
 import kotlinx.serialization.Serializable
 import ro.upb.summer.capstone.ui.auth.SignInScreen
+import ro.upb.summer.capstone.ui.decks.DeckDetailScreen
 import ro.upb.summer.capstone.ui.decks.DeckListScreen
+import ro.upb.summer.capstone.ui.generate.GenerateScreen
 
 @Composable
 fun AppNavigation(
@@ -25,13 +22,13 @@ fun AppNavigation(
 
     NavHost(
         navController = navController,
-        startDestination = if (isSignedIn) Route.DeckList else Route.AuthRoute
+        startDestination = if (isSignedIn) Route.DeckList else Route.Auth
     ) {
-        composable<Route.AuthRoute> {
+        composable<Route.Auth> {
             SignInScreen(onSignedIn = {
                 // i need to navigate to the deckList path
                 navController.navigate(Route.DeckList) {
-                    popUpTo(Route.AuthRoute) {
+                    popUpTo(Route.Auth) {
                         inclusive = true
                     }
                 }
@@ -42,14 +39,23 @@ fun AppNavigation(
                 navController.navigate(Route.DeckDetails(it))
             })
         }
-        composable<Route.DeckDetails> { entry ->
-            val route: Route.DeckDetails = entry.toRoute()
-            Column(
-                verticalArrangement = Arrangement.Center,
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                Text("you're on the deck details ${route.id} yay!")
-            }
+        composable<Route.DeckDetails> {
+            // Now the deck id is read directly in the view model
+            // val route: Route.DeckDetails = it.toRoute()
+            DeckDetailScreen(
+                onBack = navController::popBackStack,
+                onGenerate = { navController.navigate(Route.Generate) }
+            )
+        }
+        composable<Route.Generate> {
+            GenerateScreen(
+                onBack = navController::popBackStack,
+                onSaved = { deckId ->
+                    navController.navigate(Route.DeckDetails(deckId)) {
+                        popUpTo<Route.Generate> { inclusive = true }
+                    }
+                },
+            )
         }
     }
 }
@@ -57,11 +63,14 @@ fun AppNavigation(
 sealed interface Route {
 
     @Serializable
-    data object AuthRoute : Route
+    data object Auth : Route
 
     @Serializable
     data object DeckList : Route
 
     @Serializable
     data class DeckDetails(val id: String) : Route
+
+    @Serializable
+    data object Generate : Route
 }

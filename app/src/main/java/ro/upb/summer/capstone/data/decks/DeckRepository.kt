@@ -41,6 +41,28 @@ class DeckRepository @Inject constructor(
         awaitClose { listener.remove() }
     }
 
+    fun observeDeck(deckId: String): Flow<Deck?> = callbackFlow {
+        val uid = firebaseAuth.currentUser?.uid ?: run {
+            trySend(null)
+            close()
+            return@callbackFlow
+        }
+        val registration = firestore.collection("users")
+            .document(uid)
+            .collection("decks")
+            .document(deckId)
+            .addSnapshotListener { snapshot, error ->
+                if (error != null) {
+                    close(error)
+                    return@addSnapshotListener
+                }
+                trySend(snapshot
+                    ?.toObject(FirestoreDeck::class.java)
+                    ?.fromFirebase())
+            }
+        awaitClose { registration.remove() }
+    }
+
     suspend fun createDeck(deck: Deck) {
         val uid = firebaseAuth.currentUser?.uid ?: return
         val firestoreDeck = deck.toFirebase()

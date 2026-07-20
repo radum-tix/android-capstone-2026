@@ -12,6 +12,7 @@ firebaseCrashlyticsPlugin = "3.0.7"
 firebaseAppdistributionPlugin = "5.3.0"
 credentials = "1.6.0"
 googleid = "1.2.0"
+coil = "3.5.0"
 
 # Compose
 composeBom = "2026.06.01"
@@ -74,6 +75,9 @@ firebase-crashlytics = { group = "com.google.firebase", name = "firebase-crashly
 firebase-config = { group = "com.google.firebase", name = "firebase-config" }
 firebase-appcheck-playintegrity = { group = "com.google.firebase", name = "firebase-appcheck-playintegrity" }
 firebase-appcheck-debug = { group = "com.google.firebase", name = "firebase-appcheck-debug" }
+
+# Image loading for the multimodal attach-image preview.
+coil-compose = { group = "io.coil-kt.coil3", name = "coil-compose", version.ref = "coil" }
 
 # Testing
 junit = { group = "junit", name = "junit", version.ref = "junit" }

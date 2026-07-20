@@ -81,6 +81,7 @@ dependencies {
 
     // Other
     implementation(libs.kotlinx.serialization)
+    implementation(libs.coil.compose)
 
     // Hilt
     implementation(libs.hilt.android)
