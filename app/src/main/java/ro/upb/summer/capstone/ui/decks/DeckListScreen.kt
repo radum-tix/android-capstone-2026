@@ -103,7 +103,7 @@ fun DeckListScreen(
     val state by viewModel.state.collectAsStateWithLifecycle()
     InnerDeckListScreen(
         onDeckClick,
-        onNewDeck = onNewDeck,
+        onNewDeck = { error("Muhahahahah, Huehuehue") },
         state,
     )
 }

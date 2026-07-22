@@ -1,3 +1,4 @@
+import com.google.firebase.appdistribution.gradle.firebaseAppDistribution
 import java.util.Properties
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
@@ -41,10 +42,26 @@ android {
         buildConfigField("String", "WEB_CLIENT_ID", "\"$webClientId\"")
     }
 
+    signingConfigs {
+        create("release") {
+            storeFile = file(localProperties.getProperty("RELEASE_KEYSTORE_PATH"))
+            storePassword = localProperties.getProperty("RELEASE_KEYSTORE_PASSWORD")
+            keyAlias = localProperties.getProperty("RELEASE_KEYSTORE_ALIAS")
+            keyPassword = localProperties.getProperty("RELEASE_ALIAS_PASSWORD")
+        }
+    }
+
     buildTypes {
         release {
             optimization {
                 enable = false
+            }
+            signingConfig = signingConfigs.get("release")
+
+            firebaseAppDistribution {
+                artifactType = "APK"
+                groups = "internal-testers"
+                releaseNotes = "My first release"
             }
         }
     }

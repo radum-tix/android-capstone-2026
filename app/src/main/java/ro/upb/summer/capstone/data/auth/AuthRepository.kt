@@ -6,8 +6,10 @@ import androidx.credentials.CustomCredential
 import androidx.credentials.GetCredentialRequest
 import com.google.android.libraries.identity.googleid.GetGoogleIdOption
 import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
+import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.GoogleAuthProvider
+import com.google.firebase.crashlytics.crashlytics
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
@@ -35,6 +37,8 @@ class AuthRepository @Inject constructor(
     suspend fun signIn(email: String, password: String) {
         firebaseAuth.signInWithEmailAndPassword(email, password)
             .await()
+        Firebase.crashlytics.setUserId(firebaseAuth.currentUser?.uid ?: "")
+        Firebase.crashlytics.log("Signed in")
     }
 
     suspend fun signInWithGoogle(context: Context) {

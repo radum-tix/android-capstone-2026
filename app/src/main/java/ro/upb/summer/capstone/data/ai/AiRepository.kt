@@ -9,12 +9,14 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flow
 import kotlinx.serialization.json.Json
+import ro.upb.summer.capstone.data.config.ConfigRepository
 import ro.upb.summer.capstone.domain.GeneratedCard
 import ro.upb.summer.capstone.ui.generate.GenerationState
 import javax.inject.Inject
 
 class AiRepository @Inject constructor(
-    private val firebaseAi: FirebaseAI
+    private val firebaseAi: FirebaseAI,
+    private val configRepository: ConfigRepository
 ) {
     fun generate(notes: String, bitmap: Bitmap? = null): Flow<GenerationState> = flow {
         emit(GenerationState.Loading)
@@ -41,7 +43,7 @@ class AiRepository @Inject constructor(
 
     private fun buildModel() = firebaseAi
         .generativeModel(
-            modelName = "gemini-3.1-flash-lite",
+            modelName = configRepository.modelName,
             generationConfig = generationConfig {
                 responseMimeType = "application/json"
                 responseSchema = Schema.array(
@@ -52,10 +54,10 @@ class AiRepository @Inject constructor(
                         )
                     )
                 )
-                temperature = 0.7f
+                temperature = configRepository.temperature
             },
             systemInstruction = content {
-                text("You are a study assistant that generates concise, accurate flashcards from student notes. Each question should be answerable in one sentence. You always add a trick question which is funny but not necessarily true.")
+                text(configRepository.systemPrompt)
             }
         )
 }
